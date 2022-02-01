@@ -1,0 +1,7 @@
+restaurante:
+  - id_restaurante: 123
+    ds_nome: "novo 1"
+    ds_proprietario: "PROP"
+  - id_restaurante: 456
+    ds_nome: "novo 2"
+    ds_proprietario: "PROP 2"
