@@ -2,6 +2,8 @@ restaurante:
   - id_restaurante: 123
     ds_nome: "novo 1"
     ds_proprietario: "PROP"
+    nr_cnpj: "46.009.349/0001-95"
   - id_restaurante: 456
     ds_nome: "novo 2"
     ds_proprietario: "PROP 2"
+    nr_cnpj: "03.467.639/0001-70"

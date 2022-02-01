@@ -2,6 +2,7 @@ package com.brunosoares.ifood.cadastro.orm;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,6 +18,7 @@ import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
 
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
@@ -40,7 +42,7 @@ public class Localizacao extends PanacheEntityBase {
     @Override
     public boolean equals(final Object o) {
         if (this == o) return true;
-        if (o == null || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
+        if (!(o instanceof Localizacao) || Hibernate.getClass(this) != Hibernate.getClass(o)) return false;
         final Localizacao that = (Localizacao) o;
         return this.id != null && Objects.equals(this.id, that.id);
     }
