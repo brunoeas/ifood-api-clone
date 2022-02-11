@@ -19,7 +19,6 @@ public class CadastroIfoodTestLifecycleManager implements QuarkusTestResourceLif
         props.put("quarkus.datasource.jdbc.url", POSTGRES.getJdbcUrl());
         props.put("quarkus.datasource.username", POSTGRES.getUsername());
         props.put("quarkus.datasource.password", POSTGRES.getPassword());
-        props.put("quarkus.hibernate-orm.datasource.default-schema", "ifood_cadastro");
 
         return props;
     }
