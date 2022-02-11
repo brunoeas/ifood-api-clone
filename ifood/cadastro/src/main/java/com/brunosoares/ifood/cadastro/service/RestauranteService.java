@@ -1,13 +1,19 @@
 package com.brunosoares.ifood.cadastro.service;
 
+import com.brunosoares.ifood.cadastro.converter.RestauranteConverter;
+import com.brunosoares.ifood.cadastro.dto.AdicionarRestauranteDTO;
+import com.brunosoares.ifood.cadastro.dto.AtualizarRestauranteDTO;
+import com.brunosoares.ifood.cadastro.dto.RestauranteDTO;
 import com.brunosoares.ifood.cadastro.orm.Restaurante;
 import com.brunosoares.ifood.cadastro.repository.RestauranteRepository;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 import javax.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequestScoped
 public class RestauranteService {
@@ -15,23 +21,31 @@ public class RestauranteService {
     @Inject
     RestauranteRepository restauranteRepository;
 
-    public List<Restaurante> buscarTodos() {
-        return this.restauranteRepository.listAll();
+    @Inject
+    RestauranteConverter restauranteConverter;
+
+    public List<RestauranteDTO> buscarTodos() {
+        return this.restauranteRepository.listAll()
+                .stream()
+                .map(this.restauranteConverter::toRestauranteDTO)
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public Restaurante insereRestaurante(final Restaurante dto) {
-        this.restauranteRepository.persist(dto);
-        return dto;
+    public RestauranteDTO insereRestaurante(@Valid final AdicionarRestauranteDTO dto) {
+        final Restaurante orm = this.restauranteConverter.toRestauranteORM(dto);
+        this.restauranteRepository.persist(orm);
+        return this.restauranteConverter.toRestauranteDTO(orm);
     }
 
     @Transactional
-    public Restaurante atualizaRestaurante(final Restaurante dto) {
+    public RestauranteDTO atualizaRestaurante(@Valid final AtualizarRestauranteDTO dto) {
         final Restaurante orm = this.restauranteRepository.findByIdOptional(dto.getId())
                 .orElseThrow(() -> new NotFoundException("Id inexistente"));
         orm.setNome(dto.getNome());
+        this.restauranteConverter.toRestauranteORM(dto, orm);
         this.restauranteRepository.persist(orm);
-        return orm;
+        return this.restauranteConverter.toRestauranteDTO(orm);
     }
 
     @Transactional

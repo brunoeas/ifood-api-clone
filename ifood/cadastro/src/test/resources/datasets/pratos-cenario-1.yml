@@ -1,0 +1,16 @@
+restaurante:
+  - id_restaurante: 111
+    ds_nome: "Restaurante"
+    ds_proprietario: "PROP"
+
+prato:
+  - id_prato: 123
+    id_restaurante: 111
+    ds_nome: "novo 1"
+    ds_descricao: "descricao"
+    nr_preco: 10.00
+  - id_prato: 456
+    id_restaurante: 111
+    ds_nome: "novo 2"
+    ds_descricao: "descricao 2"
+    nr_preco: 14.00

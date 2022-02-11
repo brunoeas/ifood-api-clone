@@ -2,12 +2,12 @@ package com.brunosoares.ifood.cadastro.rest;
 
 import com.brunosoares.ifood.cadastro.CadastroIfoodTestLifecycleManager;
 import com.brunosoares.ifood.cadastro.RestCommon;
-import com.brunosoares.ifood.cadastro.converter.RestauranteConverter;
-import com.brunosoares.ifood.cadastro.dto.AdicionarRestauranteDTO;
-import com.brunosoares.ifood.cadastro.dto.AtualizarRestauranteDTO;
-import com.brunosoares.ifood.cadastro.dto.LocalizacaoDTO;
+import com.brunosoares.ifood.cadastro.converter.PratoConverter;
+import com.brunosoares.ifood.cadastro.dto.AdicionarPratoDTO;
+import com.brunosoares.ifood.cadastro.dto.AtualizarPratoDTO;
+import com.brunosoares.ifood.cadastro.dto.PratoDTO;
 import com.brunosoares.ifood.cadastro.dto.RestauranteDTO;
-import com.brunosoares.ifood.cadastro.orm.Restaurante;
+import com.brunosoares.ifood.cadastro.orm.Prato;
 import com.github.database.rider.cdi.api.DBRider;
 import com.github.database.rider.core.api.configuration.DBUnit;
 import com.github.database.rider.core.api.configuration.Orthography;
@@ -17,7 +17,6 @@ import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
 import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
 
@@ -29,19 +28,19 @@ import java.math.BigDecimal;
 @DBUnit(caseInsensitiveStrategy = Orthography.LOWERCASE)
 @QuarkusTest
 @QuarkusTestResource(CadastroIfoodTestLifecycleManager.class)
-public class RestauranteResourceTest {
+public class PratoResourceTest {
 
     @Inject
-    RestauranteConverter restauranteConverter;
+    PratoConverter pratoConverter;
 
     @TestSecurity(user = "proprietario1", roles = "proprietario")
     @Test
-    @Order(1)
-    @DataSet(value = "restaurantes-cenario-1.yml", disableConstraints = true)
-    public void testBuscarTodos() {
+    @DataSet(value = "pratos-cenario-1.yml", disableConstraints = true)
+    public void testBuscarPeloRestaurante() {
         final String res = RestCommon.given()
                 .when()
-                .get("/v1/restaurantes")
+                .pathParam("idRestaurante", 111L)
+                .get("/v1/pratos/restaurante/{idRestaurante}")
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract()
@@ -50,72 +49,68 @@ public class RestauranteResourceTest {
     }
 
     @TestSecurity(user = "proprietario1", roles = "proprietario")
-    @Order(2)
     @Test
-    public void testNovoRestaurante() {
-        final RestauranteDTO res = RestCommon.given()
-                .body(AdicionarRestauranteDTO.builder()
-                        .proprietario("eu mesmo")
-                        .nome("brunão")
-                        .nrCnpj("94.955.237/0001-70")
-                        .localizacao(LocalizacaoDTO.builder()
-                                .nrLatitude(new BigDecimal("10.00"))
-                                .nrLongitude(new BigDecimal("10.00"))
+    public void testNovoPrato() {
+        final PratoDTO res = RestCommon.given()
+                .body(AdicionarPratoDTO.builder()
+                        .descricao("descricao")
+                        .nome("nome")
+                        .preco(new BigDecimal("10.00"))
+                        .restaurante(RestauranteDTO.builder()
+                                .id(111L)
                                 .build())
                         .build())
                 .when()
-                .post("/v1/restaurantes")
+                .post("/v1/pratos")
                 .then()
                 .statusCode(Response.Status.CREATED.getStatusCode())
                 .extract()
-                .as(RestauranteDTO.class);
+                .as(PratoDTO.class);
 
         Assertions.assertNotNull(res);
-        final Restaurante byId = Restaurante.findById(res.getId());
+        final Prato byId = Prato.findById(res.getId());
         Assertions.assertNotNull(byId);
-        Assertions.assertTrue(new ReflectionEquals(this.restauranteConverter.toRestauranteDTO(byId),  "dtCriacao", "dtAtualizacao")
-                .matches(res));
+        Assertions.assertTrue(new ReflectionEquals(this.pratoConverter.toPratoDTO(byId)).matches(res));
     }
 
     @TestSecurity(user = "proprietario1", roles = "proprietario")
-    @Order(3)
     @Test
-    @DataSet(value = "restaurantes-cenario-1.yml", disableConstraints = true)
-    public void testAtualizarRestaurante() {
+    @DataSet(value = "pratos-cenario-1.yml", disableConstraints = true)
+    public void testAtualizarPrato() {
         final long id = 123L;
-        final RestauranteDTO res = RestCommon.given()
-                .body(AtualizarRestauranteDTO.builder()
+        final PratoDTO res = RestCommon.given()
+                .body(AtualizarPratoDTO.builder()
                         .id(id)
-                        .nome("restaurante att")
+                        .nome("nome att")
+                        .descricao("desc att")
+                        .preco(new BigDecimal("22.00"))
                         .build())
                 .when()
-                .put("/v1/restaurantes")
+                .put("/v1/pratos")
                 .then()
                 .statusCode(Response.Status.OK.getStatusCode())
                 .extract()
-                .as(RestauranteDTO.class);
+                .as(PratoDTO.class);
 
         Assertions.assertNotNull(res);
-        final Restaurante byId = Restaurante.findById(id);
+        final Prato byId = Prato.findById(id);
         Assertions.assertNotNull(byId);
-        Assertions.assertTrue(new ReflectionEquals(this.restauranteConverter.toRestauranteDTO(byId), "dtAtualizacao")
-                .matches(res));
+        Assertions.assertTrue(new ReflectionEquals(this.pratoConverter.toPratoDTO(byId)).matches(res));
     }
 
     @TestSecurity(user = "proprietario1", roles = "proprietario")
-    @Order(4)
     @Test
-    @DataSet(value = "restaurantes-cenario-1.yml", disableConstraints = true)
-    public void testDeletarRestaurante() {
+    @DataSet(value = "pratos-cenario-1.yml", disableConstraints = true)
+    public void testDeletarPrato() {
         final long id = 123L;
         RestCommon.given()
                 .pathParam("id", id)
                 .when()
-                .delete("/v1/restaurantes/{id}")
+                .delete("/v1/pratos/{id}")
                 .then()
                 .statusCode(Response.Status.NO_CONTENT.getStatusCode());
 
-        final Restaurante byId = Restaurante.findById(id);
+        final Prato byId = Prato.findById(id);
         Assertions.assertNull(byId);
     }
 
