@@ -9,7 +9,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class RestCommon {
+public final class RestCommon {
 
     public static RequestSpecification given() {
         return RestAssured.given()

@@ -33,7 +33,7 @@ public class Localizacao extends PanacheEntityBase {
     @Column(name = "id_localizacao")
     private Long id;
 
-    @Column(name = "nr_latirude")
+    @Column(name = "nr_latitude")
     private BigDecimal nrLatitude;
 
     @Column(name = "nr_longitude")

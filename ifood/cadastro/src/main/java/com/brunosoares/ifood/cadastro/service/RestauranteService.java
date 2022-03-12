@@ -6,6 +6,9 @@ import com.brunosoares.ifood.cadastro.dto.AtualizarRestauranteDTO;
 import com.brunosoares.ifood.cadastro.dto.RestauranteDTO;
 import com.brunosoares.ifood.cadastro.orm.Restaurante;
 import com.brunosoares.ifood.cadastro.repository.RestauranteRepository;
+import com.google.gson.Gson;
+import org.eclipse.microprofile.reactive.messaging.Channel;
+import org.eclipse.microprofile.reactive.messaging.Emitter;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -24,6 +27,10 @@ public class RestauranteService {
     @Inject
     RestauranteConverter restauranteConverter;
 
+    @Inject
+    @Channel("restaurantes")
+    Emitter<String> emitter;
+
     public List<RestauranteDTO> buscarTodos() {
         return this.restauranteRepository.listAll()
                 .stream()
@@ -34,8 +41,13 @@ public class RestauranteService {
     @Transactional
     public RestauranteDTO insereRestaurante(@Valid final AdicionarRestauranteDTO dto) {
         final Restaurante orm = this.restauranteConverter.toRestauranteORM(dto);
-        this.restauranteRepository.persist(orm);
-        return this.restauranteConverter.toRestauranteDTO(orm);
+        this.restauranteRepository.persistAndFlush(orm);
+
+        final RestauranteDTO restauranteDTO = this.restauranteConverter.toRestauranteDTO(orm);
+        final String json = new Gson().toJson(restauranteDTO);
+        this.emitter.send(json);
+
+        return restauranteDTO;
     }
 
     @Transactional

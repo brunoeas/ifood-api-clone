@@ -8,6 +8,14 @@ services:
       POSTGRES_PASSWORD: cadastro
     ports:
       - "5433:5432"
+  postgres_marketplace:
+    container_name: postgres_marketplace_ifood
+    image: postgres:12.2
+    environment:
+      POSTGRES_USER: marketplace
+      POSTGRES_PASSWORD: marketplace
+    ports:
+      - "5434:5432"
 
   keycloak_ifood: # Segurança, usuários, oauth
     container_name: keycloak_ifood
@@ -41,3 +49,73 @@ services:
     container_name: grafana_ifood
     image: grafana/grafana-oss:8.5.0-51396pre-ubuntu
     network_mode: "host"
+
+  artemis_ifood: # ActiveMQ Artemis - Comunicação entre API's via "eventos" (Protocolo AMQP)
+    container_name: artemis_ifood
+    image: artemis
+    ports:
+      - "8161:8161"
+      - "61616:61616"
+    environment:
+      ARTEMIS_USER: admin
+      ARTEMIS_PASSWORD: admin
+
+  mongodb_ifood: # Banco de dados não relacional
+    container_name: mongodb_ifood
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: pedido
+      MONGO_INITDB_ROOT_PASSWORD: pedido
+      MONGO_INITDB_DATABASE: pedido
+
+  zookeeper: #
+    container_name: zookeeper_container
+    image: debezium/zookeeper:1.9
+    ports:
+      - "2181:2181"
+      - "2888:2888"
+      - "3888:3888"
+
+  kafka: #
+    container_name: kafka_container
+    image: debezium/kafka:1.9
+    ports:
+      - "9092:9092"
+    links:
+      - zookeeper
+    environment:
+      - ZOOKEEPER_CONNECT=zookeeper:2181
+
+  kafdrop: #
+    container_name: kafdrop_container
+    image: obsidiandynamics/kafdrop:3.29.0
+    ports:
+      - "9001:9000"
+    environment:
+      KAFKA_BROKERCONNECT: kafka:9092
+    depends_on:
+      - kafka
+
+  elasticsearch:
+    container_name: elasticsearch_container
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.1.0
+    network_mode: "host"
+    environment:
+      - node.name=es01
+      - cluster.name=es.docker-cluster
+      - cluster.initial_master_nodes=es01
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  kibana:
+    container_name: kibana_container
+    image: docker.elastic.co/kibana/kibana:8.1.0
+    network_mode: "host"
+    environment:
+      ELASTICSEARCH_HOSTS: http://localhost:9200
