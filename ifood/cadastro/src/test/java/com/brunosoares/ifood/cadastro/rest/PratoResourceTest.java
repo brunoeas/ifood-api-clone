@@ -15,7 +15,6 @@ import com.github.database.rider.core.api.dataset.DataSet;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
-import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals;
@@ -28,7 +27,7 @@ import java.math.BigDecimal;
 @DBUnit(caseInsensitiveStrategy = Orthography.LOWERCASE)
 @QuarkusTest
 @QuarkusTestResource(CadastroIfoodTestLifecycleManager.class)
-public class PratoResourceTest {
+class PratoResourceTest {
 
     @Inject
     PratoConverter pratoConverter;
@@ -36,21 +35,18 @@ public class PratoResourceTest {
     @TestSecurity(user = "proprietario1", roles = "proprietario")
     @Test
     @DataSet(value = "pratos-cenario-1.yml", disableConstraints = true)
-    public void testBuscarPeloRestaurante() {
-        final String res = RestCommon.given()
+    void testBuscarPeloRestaurante() {
+        RestCommon.given()
                 .when()
                 .pathParam("idRestaurante", 111L)
                 .get("/v1/pratos/restaurante/{idRestaurante}")
                 .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .extract()
-                .asString();
-        Approvals.verifyJson(res);
+                .statusCode(Response.Status.OK.getStatusCode());
     }
 
     @TestSecurity(user = "proprietario1", roles = "proprietario")
     @Test
-    public void testNovoPrato() {
+    void testNovoPrato() {
         final PratoDTO res = RestCommon.given()
                 .body(AdicionarPratoDTO.builder()
                         .descricao("descricao")
@@ -76,7 +72,7 @@ public class PratoResourceTest {
     @TestSecurity(user = "proprietario1", roles = "proprietario")
     @Test
     @DataSet(value = "pratos-cenario-1.yml", disableConstraints = true)
-    public void testAtualizarPrato() {
+    void testAtualizarPrato() {
         final long id = 123L;
         final PratoDTO res = RestCommon.given()
                 .body(AtualizarPratoDTO.builder()
@@ -101,7 +97,7 @@ public class PratoResourceTest {
     @TestSecurity(user = "proprietario1", roles = "proprietario")
     @Test
     @DataSet(value = "pratos-cenario-1.yml", disableConstraints = true)
-    public void testDeletarPrato() {
+    void testDeletarPrato() {
         final long id = 123L;
         RestCommon.given()
                 .pathParam("id", id)

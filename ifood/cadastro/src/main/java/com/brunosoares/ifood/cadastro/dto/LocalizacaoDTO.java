@@ -16,6 +16,8 @@ import java.math.BigDecimal;
 public class LocalizacaoDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private Long id;
+
     @NotNull
     private BigDecimal nrLatitude;
 

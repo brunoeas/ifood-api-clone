@@ -15,7 +15,6 @@ import com.github.database.rider.core.api.dataset.DataSet;
 import io.quarkus.test.common.QuarkusTestResource;
 import io.quarkus.test.junit.QuarkusTest;
 import io.quarkus.test.security.TestSecurity;
-import org.approvaltests.Approvals;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
@@ -29,7 +28,7 @@ import java.math.BigDecimal;
 @DBUnit(caseInsensitiveStrategy = Orthography.LOWERCASE)
 @QuarkusTest
 @QuarkusTestResource(CadastroIfoodTestLifecycleManager.class)
-public class RestauranteResourceTest {
+class RestauranteResourceTest {
 
     @Inject
     RestauranteConverter restauranteConverter;
@@ -38,21 +37,18 @@ public class RestauranteResourceTest {
     @Test
     @Order(1)
     @DataSet(value = "restaurantes-cenario-1.yml", disableConstraints = true)
-    public void testBuscarTodos() {
-        final String res = RestCommon.given()
+    void testBuscarTodos() {
+        RestCommon.given()
                 .when()
                 .get("/v1/restaurantes")
                 .then()
-                .statusCode(Response.Status.OK.getStatusCode())
-                .extract()
-                .asString();
-        Approvals.verifyJson(res);
+                .statusCode(Response.Status.OK.getStatusCode());
     }
 
     @TestSecurity(user = "proprietario1", roles = "proprietario")
     @Order(2)
     @Test
-    public void testNovoRestaurante() {
+    void testNovoRestaurante() {
         final RestauranteDTO res = RestCommon.given()
                 .body(AdicionarRestauranteDTO.builder()
                         .proprietario("eu mesmo")
@@ -81,7 +77,7 @@ public class RestauranteResourceTest {
     @Order(3)
     @Test
     @DataSet(value = "restaurantes-cenario-1.yml", disableConstraints = true)
-    public void testAtualizarRestaurante() {
+    void testAtualizarRestaurante() {
         final long id = 123L;
         final RestauranteDTO res = RestCommon.given()
                 .body(AtualizarRestauranteDTO.builder()
@@ -106,7 +102,7 @@ public class RestauranteResourceTest {
     @Order(4)
     @Test
     @DataSet(value = "restaurantes-cenario-1.yml", disableConstraints = true)
-    public void testDeletarRestaurante() {
+    void testDeletarRestaurante() {
         final long id = 123L;
         RestCommon.given()
                 .pathParam("id", id)

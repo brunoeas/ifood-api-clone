@@ -1,0 +1,15 @@
+restaurante:
+  - id_restaurante: 321
+    ds_nome: "Restaurante Lenha"
+
+prato:
+  - id_prato: 123
+    id_restaurante: 321
+    ds_nome: "Prato tal"
+    ds_descricao: "descricao 1"
+    nr_preco: 11.00
+  - id_prato: 456
+    id_restaurante: 321
+    ds_nome: "Prato ex 2"
+    ds_descricao: "descricao 2!"
+    nr_preco: 15.00
